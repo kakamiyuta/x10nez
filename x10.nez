@@ -29,6 +29,56 @@ LocalVariableDeclaration  = { 'var x = 1' #Stub }
 Formals                   = { '(ID : Int)' #Stub }
 LoopIndex                 = { 'li' #Stub }
 
+d = '0'
+  / [1-9][0-9]*
+
+d8 = '0'
+   / [1-7][0-7]*
+
+d16 = '0'
+    / [1-9A-F][0-9A-F]*
+
+i = d
+  / '0' d8
+  / '0' 'x' d16
+  / '0' 'X' d16
+
+s = '+' / '-'
+b = d
+  / d '.'
+  / '.' d
+
+x = (e / E) sd
+
+f = b x
+
+self = 'null'
+
+Int = { s i ('n' / 'N') #Int}
+
+Long = { s i ('l'/'L') #Long}
+
+UInt = { i ('un' / 'nu' / 'UN' / 'NU') #UInt}
+
+ULong = { i ('u' / 'ul' / 'lu' / 'U' / 'UL' / 'LU') #ULong}
+
+Short = { s i ('s' / 'S') #Short}
+
+UShort = { i ('us' / 'su' / 'SU' / 'US') #UShort}
+
+Byte = { s i ('y' / 'Y') #Byte}
+
+UByte = { i ('uy' / 'yu' / 'UY' / 'YU') #UByte}
+
+Float = { s f ('f' / 'F') #Float}
+
+Double = { s f ('d' / 'D') #Double}
+       / { s f 'e' d #Double}
+
+Char = c / [\b\t\n\f\r] / [\'] / [\"] / [\\] / [\dd]
+
+c = !(\').
+
 example PackageDeclaration '''
 package ID.ID;
 '''
@@ -374,4 +424,3 @@ KEYWORD                   = "abstract" / "as" / "assert" / "async" / "at"
 "!~"                      = '!~'
 "-<"                      = '-<'
 ">-"                      = '>-'
-
