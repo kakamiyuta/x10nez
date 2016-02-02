@@ -9,9 +9,9 @@ WHITESPACE                = [ \t\f\r\n]
 BLOCKCOMMENT              = '/*' ( !'*/' . )* '*/'
 LINECOMMENT               = '//' ( ![\r\n] . )*
 W                         = [a-zA-Z_0-9]
-
+/*
 /* Declarations */
-PackageDeclaration        = { 'package P;' #Stub }
+/*PackageDeclaration        = { 'package P;' #Stub }
 ImportDeclarations        = { 'import I;' #Stub }
 
 TypeDeclarations          = { 'class X{}' #Stub }
@@ -27,11 +27,11 @@ PropertyMethodDeclaration = { 'x() {}' #Stub }
 FieldDeclaration          = { 'x:Int;' #Stub }
 LocalVariableDeclaration  = { 'var x = 1' #Stub }
 Formals                   = { '(ID : Int)' #Stub }
-LoopIndex                 = { 'li' #Stub }
+LoopIndex                 = { 'li' #Stub }*/
 
 
 
-example PackageDeclaration '''
+/*example PackageDeclaration '''
 package ID.ID;
 '''
 example ImportDeclarations '''
@@ -67,11 +67,11 @@ val ID = 1;
 '''
 example LocalVariableDeclaration '''
 var ID : Int;
-'''
+'''*/
 
 
 /* Types */
-Type                      = { 'Int' #Stub }
+/*Type                      = { 'Int' #Stub }
 
 Annotations               = { '@A' #Stub }
 
@@ -83,11 +83,11 @@ example Type Int
 example Type ID[ID]
 example Type ID[ID,ID]
 example Type ID.ID
-example Type (ID : Int) => Int
+example Type (ID : Int) => Int*/
 
 
 /* Statements */
-Block                     = { '{}' #Stub }
+/*Block                     = { '{}' #Stub }
 Statement                 = { 'stmt' #Stub }
 
 example Block {}
@@ -141,10 +141,10 @@ example Statement ateach(li in exp) {}
 example Statement ateach(exp) {}
 example Statement atomic {}
 example Statement when(exp) {}
-
+*/
 
 /* Expressions */
-Arguments                 = { '()' #Stub }
+/*Arguments                 = { '()' #Stub }
 Expression                = { 'exp' #Stub }
 
 example Expression ID
@@ -183,11 +183,11 @@ example Expression ID.new ID()
 example Expression new ID() {}
 example Expression [1, 1, 1]
 example Expression (ID : Int) => @A {}
-example Expression at(this) ID
+example Expression at(this) ID*/
 
 
 /* Identifiers */
-Identifier                = { 'ID' #Stub }
+/*Identifier                = { 'ID' #Stub }
 FullyQualifiedName        = { 'ID' #Stub }
 
 example Identifier Hoge_piyo
@@ -199,11 +199,27 @@ example Identifier `!`
 example Identifier `(unbalanced(`
 example Identifier '''
 `\`\\`
-'''
+'''*/
 
 
 /* Literals */
-Literal                   = { '1' #Stub }
+Literal = boolean
+        / self
+        / Int
+        / UInt
+        / UShort
+        / UByte
+        / ULong
+        / Short
+        / Byte
+        / Float
+        / Long
+        / Double
+        / String
+        / Char
+
+boolean = {'true' #boolean}
+        / {'false' #boolean}
 
 d = '0'
   / [1-9][0-9]*
@@ -212,48 +228,65 @@ d8 = '0'
    / [1-7][0-7]*
 
 d16 = '0'
-    / [1-9A-F][0-9A-F]*
+    / [1-9A-Fa-f][0-9A-Fa-f]*
 
-i = d
-  / '0' d8
-  / '0' 'x' d16
-  / '0' 'X' d16
+i = '0' d8
+  / '0' ('x' / 'X') d16
+  / d
 
 s = '+' / '-'
-b = d
+b = d '.' d
   / d '.'
+  / d
   / '.' d
 
-x = (e / E) sd
+x = ('e' / 'E') s d
 
-f = b x
+f = b x?
 
-self = 'null'
+self = {'null' #null}
 
-Int = { s i ('n' / 'N') #Int}
+Int = { s? i ('n' / 'N') #Int}
 
-Long = { s i ('l'/'L') #Long}
+Long = { s? i ('l'/'L') #Long}
+     / { s? i !('.' / 'e') #Long}
 
 UInt = { i ('un' / 'nu' / 'UN' / 'NU') #UInt}
 
 ULong = { i ('u' / 'ul' / 'lu' / 'U' / 'UL' / 'LU') #ULong}
 
-Short = { s i ('s' / 'S') #Short}
+Short = { s? i ('s' / 'S') #Short}
 
 UShort = { i ('us' / 'su' / 'SU' / 'US') #UShort}
 
-Byte = { s i ('y' / 'Y') #Byte}
+Byte = { s? i ('y' / 'Y') #Byte}
 
 UByte = { i ('uy' / 'yu' / 'UY' / 'YU') #UByte}
 
-Float = { s f ('f' / 'F') #Float}
+Float = { s? f ('f' / 'F') #Float}
 
-Double = { s f ('d' / 'D') #Double}
-       / { s f 'e' d #Double}
+Double = { s? f ('d' / 'D') #Double}
+       / { s? f 'e' s? d #Double}
+       / { s? f #Double}
 
-Char = c / [\b\t\n\f\r] / [\'] / [\"] / [\\] / [\dd]
 
-c = !([\] / "'").
+Char = { ['] CharacterContents ['] #Char }
+
+CharacterContents = !['"\\].
+                  / '\\' 'b'
+                  / '\\' 't'
+                  / '\\' 'n'
+                  / '\\' 'f'
+                  / '\\' 'r'
+                  / '\\' [']
+                  / '\\' '"'
+                  / '\\' '\\'
+                  / '\\' dd
+
+dd = '0' [0-3]* [0-7]* [0-7]*
+
+
+String = { '"' CharacterContents* '"' #String}
 
 example Literal true
 example Literal false
@@ -376,8 +409,8 @@ KEYWORD                   = "abstract" / "as" / "assert" / "async" / "at"
 "}"                       = '}'
 "["                       = '['
 "]"                       = ']'
-/*";"                       = ';'
-","                       = ','*/
+";"                       = ';'
+","                       = ','
 "."                       = '.' ![.]
 "=="                      = '=='
 "!="                      = '!='
